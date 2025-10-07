@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>JustPersonal · Panel Principal</title>
+<style>
+    :root {
+        --bg: #f8fafc;         /* slate-50 */
+        --panel: #ffffff;      /* fondo blanco */
+        --card: #ffffff;       /* tarjetas blancas */
+        --muted: #64748b;      /* slate-500 */
+        --text: #0f172a;       /* slate-900 */
+        --line: #e2e8f0;       /* borde claro */
+        --accent: #0ea5e9;     /* sky-500 */
+        --accent-2: #22c55e;   /* green-500 */
+        --danger: #ef4444;     /* red-500 */
+        --shadow: 0 4px 12px rgba(2,6,23,.08);
+        --shadow-lg: 0 10px 30px rgba(2,6,23,.1);
+    }
+
+    html[data-theme="dark"] {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --card: #1e293b;
+        --muted: #94a3b8;
+        --text: #f1f5f9;
+        --line: #334155;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial;color:var(--text); transition: background .2s, color .2s;}
+    header.top{padding:16px 24px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:10; display:flex; justify-content:space-between; align-items:center;}
+    h1{margin:0;font-size:22px}
+    main{max-width:1200px;margin:32px auto;padding:0 24px;}
+    .full{grid-column:1/-1}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow); transition: transform .2s, box-shadow .2s;}
+    .card:hover{transform: translateY(-4px); box-shadow: var(--shadow-lg);}
+    .card header{position:initial;background:transparent;border:0;padding:20px 20px 0}
+    .card .content{padding:20px}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .col{display:flex;flex-direction:column;gap:8px}
+    .btn{appearance:none;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:600;background:var(--panel);transition:.15s}
+    .btn:hover{background:var(--bg); border-color: var(--accent);}
+    .btn.primary{border-color:var(--accent);color:var(--accent); background: transparent;}
+    .btn.primary:hover{background:var(--accent); color: white;}
+    .btn.secondary{border-color:var(--accent-2);color:#065f46}
+    .btn.danger{border-color:var(--danger);color:#991b1b}
+    .btn.ghost{background:transparent;border-color:var(--line);color:var(--muted)}
+    .btn.ghost:hover{color:var(--text); background: var(--bg);}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .grid{display:grid;gap:16px}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.three{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+    @media (max-width:900px){main{grid-template-columns:1fr; padding: 0 16px;}.grid.two,.grid.three{grid-template-columns:1fr}}
+    label{font-size:13px;color:var(--muted); font-weight: 500;}
+    input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text)}
+    textarea{font-family: inherit; line-height: 1.5;}
+    input:focus, select:focus, textarea:focus {outline: 2px solid var(--accent); border-color: transparent;}
+    table{width:100%;border-collapse:collapse;border:1px solid var(--line)}
+    th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+    th{background:var(--bg)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0 0; border-bottom: 1px solid var(--line); padding-bottom: 12px;}
+    .tab{padding:8px 14px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;user-select:none; font-weight: 600;}
+    .tab:hover{background: var(--bg); color: var(--text);}
+    .tab[aria-selected="true"]{background:var(--bg);border-color:var(--line);color:var(--text)}
+    .hidden{display:none !important}
+    .note{font-size:12px;color:var(--muted)}
+
+    /* Dashboard Grid */
+    .dashboard-grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;}
+    .section-launcher {display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; cursor: pointer; gap: 12px;}
+    .section-launcher span:first-child {font-size: 48px;}
+    .section-launcher span:last-child {font-size: 18px; font-weight: 600;}
+
+    /* KPI */
+    .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .kpi .box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px}
+    .kpi .title{font-size:14px;color:var(--muted)}
+    .kpi .value{font-weight:700;font-size:24px;margin-top:8px}
+
+    /* Toast */
+    .toast{position:fixed;right:20px;bottom:20px;background:var(--panel);border:1px solid var(--line);padding:14px 18px;border-radius:12px;box-shadow:var(--shadow-lg);opacity:0;transform:translateY(8px);transition:.3s;z-index:120}
+    .toast.show{opacity:1;transform:translateY(0)}
+
+    /* Panel de sección */
+    .section-panel{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%) scale(0.95); opacity: 0; width:90vw;height:90vh;max-width:1200px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden;z-index:100;display:flex;flex-direction:column; pointer-events: none; transition: transform .3s, opacity .3s;}
+    .section-panel.open{transform:translate(-50%, -50%) scale(1); opacity: 1; pointer-events: all;}
+    .section-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--bg)}
+    .section-title{font-weight:700;font-size:18px}
+    .section-actions{display:flex;gap:6px}
+    .section-body{flex:1;overflow:auto;padding:24px}
+
+    /* Chat lateral (burbuja) */
+    .chat-launcher{position:fixed;right:24px;bottom:24px;z-index:70}
+    .chat-bubble{position:fixed;right:24px;bottom:88px;width:380px;max-width:95vw;height:68vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden;z-index:70; transform: translateY(12px) scale(0.95); opacity: 0; transition: .3s; pointer-events: none;}
+    .chat-bubble.open{transform: translateY(0) scale(1); opacity: 1; pointer-events: all;}
+    .chat-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--bg)}
+    .chat-title{font-weight:700}
+    .chat-actions{display:flex;gap:6px}
+    .chipbar{display:flex;gap:8px;overflow-x: auto; padding:12px;border-bottom:1px dashed var(--line)}
+    .chip{padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);font-size:12px;cursor:pointer; white-space: nowrap;}
+    .chip:hover{background: var(--accent); color: white; border-color: var(--accent);}
+    .chat-body{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+    .msg{max-width:84%;padding:10px 14px;border-radius:14px;border:1px solid var(--line);background:var(--panel); line-height: 1.5;}
+    .msg.me{align-self:flex-end;background:#dbeafe; color: #1e40af;}
+    html[data-theme="dark"] .msg.me{background: #3b82f6; color: white;}
+    .chat-footer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--panel)}
+    .chat-footer input{flex:1}
+    .typing{font-size:12px;color:var(--muted);font-style:italic; align-self: flex-start;}
+    .inline-actions{display:flex;gap:8px;margin-top:10px; flex-wrap: wrap;}
+
+    /* Overlay y Modal */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;opacity:0; transition: opacity .3s; pointer-events: none;}
+    .overlay.open{opacity:1; pointer-events: all;}
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:110;opacity:0;transform:scale(0.95);transition:.3s;pointer-events:none;}
+    .modal.open{opacity:1;transform:scale(1);pointer-events:all;}
+    .modal .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);width:min(600px,95vw);max-height:80vh;display:flex;flex-direction:column;}
+    .modal .box header{padding:12px 16px;border-bottom:1px solid var(--line);font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+    .modal .box .content{padding:16px;overflow:auto;line-height:1.6;}
+    .modal .box .content h3 {margin: 16px 0 8px 0;}
+    .modal .box .content pre {white-space:pre-wrap; font-family:inherit; background: var(--bg); padding: 12px; border-radius: 8px;}
+
+    /* Mejoras para el chat */
+    .source-link{display:inline-block;margin-top: 8px;padding:6px 10px;background:var(--bg);border-radius:8px;font-size:12px;text-decoration:none;color:var(--accent); font-weight: 600;}
+    .source-link:hover{background:var(--line)}
+</style>
+</head>
+<body>
+  <header class="top">
+    <h1>JustPersonal · Panel Principal</h1>
+    <button class="btn ghost" id="theme-toggle" title="Cambiar tema">🌙</button>
+  </header>
+  
+  <main>
+    <div class="dashboard-grid">
+      <div class="card section-launcher" onclick="openSection('panel-finanzas')">
+        <span>💰</span>
+        <span>Finanzas</span>
+      </div>
+      <div class="card section-launcher" onclick="openSection('panel-salud')">
+        <span>🏥</span>
+        <span>Salud</span>
+      </div>
+      <div class="card section-launcher" onclick="openSection('panel-entretenimiento')">
+        <span>🎮</span>
+        <span>Entretenimiento</span>
+      </div>
+       <div class="card section-launcher" onclick="openSection('panel-deportes')">
+        <span>⚽</span>
+        <span>Deportes</span>
+      </div>
+      <div class="card section-launcher" onclick="openSection('panel-cocina')">
+        <span>🍳</span>
+        <span>Cocina</span>
+      </div>
+      <div class="card section-launcher" onclick="openSection('panel-redes')">
+        <span>📱</span>
+        <span>Redes Sociales</span>
+      </div>
+    </div>
+  </main>
+
+  <div class="overlay" id="panel-overlay" onclick="closeAll()"></div>
+
+  <div class="modal" id="modal">
+    <div class="box">
+      <header>
+        <span id="modal-title">Detalle</span>
+        <button class="btn ghost" id="modal-close">✖</button>
+      </header>
+      <div class="content" id="modal-content"></div>
+    </div>
+  </div>
+  
+  <div class="section-panel" id="panel-finanzas">
+    <div class="section-header">
+      <div class="section-title">Finanzas</div>
+      <div class="section-actions">
+        <button class="btn ghost" onclick="closeSection('panel-finanzas')" title="Cerrar">✖</button>
+      </div>
+    </div>
+    <div class="section-body">
+      <section class="full">
+        <header>
+          <div aria-label="Gestión de Finanzas" class="tabs" role="tablist">
+            <button aria-controls="panel-resumen" aria-selected="true" class="tab" id="tab-resumen" role="tab">Resumen</button>
+            <button aria-controls="panel-propiedades" aria-selected="false" class="tab" id="tab-propiedades" role="tab">Propiedades</button>
+            <button aria-controls="panel-alquileres" aria-selected="false" class="tab" id="tab-alquileres" role="tab">Alquileres</button>
+            <button aria-controls="panel-ingresos" aria-selected="false" class="tab" id="tab-ingresos" role="tab">Otros Ingresos</button>
+            <button aria-controls="panel-gastos" aria-selected="false" class="tab" id="tab-gastos" role="tab">Gastos</button>
+            <button aria-controls="panel-servicios" aria-selected="false" class="tab" id="tab-servicios" role="tab">Servicios</button>
+          </div>
+        </header>
+        <div class="content">
+          <div aria-labelledby="tab-resumen" id="panel-resumen" role="tabpanel">
+            <div class="row" style="align-items:end;gap:16px"><input id="res-mes" type="month"/> <button class="btn" id="btn-refrescar-resumen" type="button">Refrescar</button> <div class="row" style="margin-left:auto"> <button class="btn" id="btn-export" type="button">Exportar</button> <input accept="application/json" class="hidden" id="file-import" type="file"/> <button class="btn ghost" id="btn-import" type="button">Importar</button> </div></div>
+            <div class="kpi" style="margin-top:24px"><div class="box"><div class="title">Ingresos Mes</div><div class="value" id="kpi-ing-mes">$0</div></div> <div class="box"><div class="title">Alquiler Mes</div><div class="value" id="kpi-renta-mes">$0</div></div> <div class="box"><div class="title">Gastos Mes</div><div class="value" id="kpi-gas-mes">$0</div></div> <div class="box"><div class="title">Saldo Mes</div><div class="value" id="kpi-saldo-mes">$0</div></div></div>
+            <div class="kpi" style="margin-top:16px"><div class="box"><div class="title">Ingresos Acum</div><div class="value" id="kpi-ing-acum">$0</div></div> <div class="box"><div class="title">Alquiler Acum</div><div class="value" id="kpi-renta-acum">$0</div></div> <div class="box"><div class="title">Gastos Acum</div><div class="value" id="kpi-gas-acum">$0</div></div> <div class="box"><div class="title">Saldo Acum</div><div class="value" id="kpi-saldo-acum">$0</div></div></div>
+          </div>
+          <div aria-labelledby="tab-propiedades" class="hidden" id="panel-propiedades" role="tabpanel"><form autocomplete="off" class="grid two" id="form-propiedad"><input id="prop-id" type="hidden"/><div class="col"><label for="prop-nombre">Nombre Propiedad</label><input id="prop-nombre" required=""/></div><div class="col"><label for="prop-ciudad">Ciudad</label><input id="prop-ciudad" required=""/></div><div class="col"><label for="prop-arrendatario">Arrendatario</label><input id="prop-arrendatario" required=""/></div><div class="col"><label for="prop-alquiler">Alquiler Mensual ($)</label><input id="prop-alquiler" min="0" placeholder="0" step="0.01" type="number"/></div><div class="row" style="align-items:end; grid-column: 1 / -1;"><button class="btn primary" type="submit">Guardar</button><button class="btn ghost" type="reset">Limpiar</button></div></form><div style="margin-top:24px"><table id="tabla-propiedades"><thead><tr><th>Propiedad</th><th>Ciudad</th><th>Arrendatario</th><th>Alquiler</th><th></th></tr></thead><tbody></tbody></table></div></div>
+          <div aria-labelledby="tab-alquileres" class="hidden" id="panel-alquileres" role="tabpanel"><form autocomplete="off" class="grid three" id="form-alquiler"><div class="col"><label for="alq-propiedad">Propiedad</label><select id="alq-propiedad" required><option value="">Seleccionar</option></select></div><div class="col"><label for="alq-mes">Mes</label><input id="alq-mes" type="month" required/></div><div class="col"><label for="alq-monto">Monto Pagado</label><input id="alq-monto" min="0" step="0.01" type="number" required/></div><div class="row" style="align-items:end"><button class="btn primary" type="submit">Registrar Pago</button><button class="btn ghost" type="reset">Limpiar</button></div></form><div style="margin-top:24px"><table id="tabla-alquileres"><thead><tr><th>Propiedad</th><th>Mes</th><th>Monto</th><th></th></tr></thead><tbody></tbody></table></div></div>
+          <div aria-labelledby="tab-ingresos" class="hidden" id="panel-ingresos" role="tabpanel"><form autocomplete="off" class="grid three" id="form-ingreso"><div class="col"><label for="ing-monto">Monto</label><input id="ing-monto" required="" step="0.01" type="number"/></div><div class="col"><label for="ing-desc">Descripción</label><input id="ing-desc"/></div><div class="col"><label for="ing-fecha">Fecha</label><input id="ing-fecha" required="" type="date"/></div><div class="row" style="align-items:end"><button class="btn primary" type="submit">Guardar</button><button class="btn ghost" type="reset">Limpiar</button></div></form><div style="margin-top:24px"><table id="tabla-ingresos"><thead><tr><th>Fecha</th><th>Monto</th><th>Descripción</th><th></th></tr></thead><tbody></tbody></table></div></div>
+          <div aria-labelledby="tab-gastos" class="hidden" id="panel-gastos" role="tabpanel"><form autocomplete="off" class="grid three" id="form-gasto"><div class="col"><label for="gas-monto">Monto</label><input id="gas-monto" required="" step="0.01" type="number"/></div><div class="col"><label for="gas-desc">Descripción</label><input id="gas-desc"/></div><div class="col"><label for="gas-fecha">Fecha</label><input id="gas-fecha" required="" type="date"/></div><div class="row" style="align-items:end"><button class="btn primary" type="submit">Guardar</button><button class="btn ghost" type="reset">Limpiar</button></div></form><div style="margin-top:24px"><table id="tabla-gastos"><thead><tr><th>Fecha</th><th>Monto</th><th>Descripción</th><th></th></tr></thead><tbody></tbody></table></div></div>
+          <div aria-labelledby="tab-servicios" class="hidden" id="panel-servicios" role="tabpanel"><form autocomplete="off" class="grid two" id="form-servicio"><div class="col"><label for="serv-empresa">Empresa</label><input id="serv-empresa" required=""/></div><div class="col"><label for="serv-propiedad">Propiedad</label><input id="serv-propiedad" required=""/></div><div class="col"><label for="serv-ciudad">Ciudad</label><input id="serv-ciudad"/></div><div class="col"><label for="serv-url">URL</label><input id="serv-url" type="url"/></div><div class="row" style="align-items:end"><button class="btn primary" type="submit">Guardar</button><button class="btn ghost" type="reset">Limpiar</button></div></form><div style="margin-top:24px"><table id="tabla-servicios"><thead><tr><th>Empresa</th><th>Propiedad</th><th>URL</th><th></th></tr></thead><tbody></tbody></table></div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="section-panel" id="panel-salud">
+    <div class="section-header"><div class="section-title">Salud</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-salud')" title="Cerrar">✖</button></div></div>
+    <div class="section-body"><h2>Panel de Salud</h2><p>Aquí puedes gestionar tu información de salud:</p><div class="grid two"><div class="col"><label for="peso">Peso (kg)</label><input id="peso" type="number" step="0.1"/></div><div class="col"><label for="altura">Altura (cm)</label><input id="altura" type="number"/></div><div class="col"><label for="presion">Presión arterial</label><input id="presion" placeholder="120/80"/></div><div class="col"><label for="fecha-salud">Fecha</label><input id="fecha-salud" type="date"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar registro</button></div></div>
+  </div>
+
+  <div class="section-panel" id="panel-entretenimiento">
+    <div class="section-header"><div class="section-title">Entretenimiento</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-entretenimiento')" title="Cerrar">✖</button></div></div>
+    <div class="section-body"><h2>Panel de Entretenimiento</h2><p>Gestiona tus películas, series y videojuegos:</p><div class="grid two"><div class="col"><label for="tipo-contenido">Tipo</label><select id="tipo-contenido"><option value="pelicula">Película</option><option value="serie">Serie</option><option value="videojuego">Videojuego</option></select></div><div class="col"><label for="titulo">Título</label><input id="titulo"/></div><div class="col"><label for="estado">Estado</label><select id="estado"><option value="por-ver">Por ver</option><option value="viendo">Viendo</option><option value="visto">Visto</option></select></div><div class="col"><label for="calificacion">Calificación (1-5)</label><input id="calificacion" type="number" min="1" max="5"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div>
+  </div>
+  
+  <div class="section-panel" id="panel-deportes">
+    <div class="section-header"><div class="section-title">Deportes y Enlaces Favoritos</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-deportes')" title="Cerrar">✖</button></div></div>
+    <div class="section-body"><h2>Mis Enlaces</h2><p>Guarda aquí tus páginas web de deportes o de cualquier otro tema.</p><form autocomplete="off" class="grid two" id="form-link" style="margin-top: 20px;"><div class="col"><label for="link-nombre">Nombre del Sitio</label><input id="link-nombre" required="" placeholder="Ej: ESPN, Marca, etc."/></div><div class="col"><label for="link-url">URL del Sitio</label><input id="link-url" required="" type="url" placeholder="https://www.ejemplo.com"/></div><div class="row" style="align-items:end;"><button class="btn primary" type="submit">Guardar Enlace</button></div></form><div style="margin-top:24px"><table id="tabla-links"><thead><tr><th>Nombre</th><th>URL</th><th></th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <div class="section-panel" id="panel-cocina">
+    <div class="section-header"><div class="section-title">Mis Recetas de Cocina</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-cocina')" title="Cerrar">✖</button></div></div>
+    <div class="section-body"><h2>Nueva Receta</h2><form autocomplete="off" class="grid" id="form-receta"><div class="col full"><label for="receta-nombre">Nombre de la Receta</label><input id="receta-nombre" required="" /></div><div class="col"><label for="receta-ingredientes">Ingredientes</label><textarea id="receta-ingredientes" rows="6" placeholder="- 1kg de papas&#10;- 2 cucharadas de aceite&#10;..."></textarea></div><div class="col"><label for="receta-instrucciones">Instrucciones</label><textarea id="receta-instrucciones" rows="6" placeholder="1. Pelar y cortar las papas.&#10;2. ..."></textarea></div><div class="row"><button class="btn primary" type="submit">Guardar Receta</button></div></form><h2 style="margin-top: 32px;">Recetas Guardadas</h2><div style="margin-top:12px"><table id="tabla-recetas"><thead><tr><th>Nombre</th><th>Acciones</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <div class="section-panel" id="panel-redes">
+    <div class="section-header"><div class="section-title">Redes Sociales</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-redes')" title="Cerrar">✖</button></div></div>
+    <div class="section-body"><h2>Panel de Redes Sociales</h2><p>Gestiona tus perfiles:</p><div class="grid two"><div class="col"><label for="red-social">Red Social</label><select id="red-social"><option value="facebook">Facebook</option><option value="twitter">Twitter</option><option value="instagram">Instagram</option></select></div><div class="col"><label for="usuario">Usuario</label><input id="usuario"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div>
+  </div>
+
+  <div class="chat-launcher"><button class="btn primary" id="open-chat" title="Asistente" style="padding: 16px; border-radius: 999px; box-shadow: var(--shadow-lg);">💬</button></div>
+  <aside aria-live="polite" class="chat-bubble" id="chat-panel">
+    <div class="chat-header"><div class="chat-title">Asistente Virtual</div><div class="chat-actions"><button class="btn ghost" id="btn-clear-chat" title="Borrar historial">🗑️</button><button class="btn ghost" id="btn-close-chat" title="Cerrar">✖</button></div></div>
+    <div class="chipbar"><span class="chip" data-chip="finanzas">💼 Finanzas</span><span class="chip" data-chip="resumen">📊 Resumen</span><span class="chip" data-chip="noticias">📰 Noticias</span><span class="chip" data-chip="tecnologia">🤖 Tecnología</span><span class="chip" data-chip="ayuda">❓ Ayuda</span></div>
+    <div class="chat-body" id="chat-body"></div>
+    <div class="chat-footer"><input id="chat-input" placeholder="Pregunta lo que quieras..."/><button class="btn primary" id="chat-send">Enviar</button></div>
+  </aside>
+  <div aria-live="polite" class="toast" id="toast" role="status"></div>
+  
+  <script>
+    // ===== CONFIGURACIÓN =====
+    const API_CONFIG = {
+        duckDuckGo: (query) => `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1&t=justpersonalapp`,
+        wikipediaSearch: (query) => `https://es.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=1&namespace=0&format=json&origin=*`,
+        wikipediaSummary: (title) => `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+    };
+    const DB={ props:'fin:props', ing:'fin:ing', gas:'fin:gas', serv:'fin:serv', chat:'fin:chat', alq:'fin:alq', links: 'app:links', recetas: 'app:recetas' };
+
+    // ===== UTILIDADES =====
+    const $=(s,r=document)=>r.querySelector(s); 
+    const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    const toast=(m)=>{const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500)};
+    const storage={ get:(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}, set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)) };
+    const fmt=(n)=> new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(n||0));
+    const toYM=d=>(d||'').slice(0,7); 
+
+    // ===== ESTADO =====
+    const state={ 
+      propiedades:storage.get(DB.props,[]), ingresos:storage.get(DB.ing,[]), gastos:storage.get(DB.gas,[]), 
+      servicios:storage.get(DB.serv,[]), chat:storage.get(DB.chat,[]), alquileres:storage.get(DB.alq,[]),
+      links: storage.get(DB.links, []), recetas: storage.get(DB.recetas, [])
+    };
+    const persist=()=>{ Object.keys(DB).forEach(key => storage.set(DB[key], state[key] || state[Object.keys(state).find(sk => DB[key].includes(sk))])); };
+
+    // ===== UI (PANELES, MODALES, TABS, DARK MODE) =====
+    (function() {
+      const btn = $('#theme-toggle'); const storedTheme = storage.get('theme'); const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; const doc = document.documentElement;
+      const applyTheme = (theme) => { doc.setAttribute('data-theme', theme); btn.textContent = theme === 'dark' ? '☀️' : '🌙'; };
+      btn.addEventListener('click', () => { const newTheme = doc.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; storage.set('theme', newTheme); applyTheme(newTheme); });
+      applyTheme(storedTheme || (prefersDark ? 'dark' : 'light'));
+    })();
+    const modal = $('#modal'); const overlay = $('#panel-overlay');
+    function openSection(id) { overlay.classList.add('open'); $(`#${id}`).classList.add('open'); }
+    function closeSection(id) { $(`#${id}`).classList.remove('open'); if (!$$('.section-panel.open').length) overlay.classList.remove('open');}
+    function openModal(title, content) { $('#modal-title').textContent = title; $('#modal-content').innerHTML = content; overlay.classList.add('open'); modal.classList.add('open'); }
+    function closeModal() { modal.classList.remove('open'); if (!$$('.section-panel.open').length) overlay.classList.remove('open'); }
+    function closeAll() { $$('.section-panel.open').forEach(p => p.classList.remove('open')); closeModal(); }
+    $('#modal-close').addEventListener('click', closeModal);
+    (function(){ 
+      const tabs=$$('.tab'); const panels=$$('.tabs ~ .content > div');
+      const sel=(id)=>{ tabs.forEach(t=>t.setAttribute('aria-selected',t.id==='tab-'+id)); panels.forEach(p=>p.classList.toggle('hidden',p.id!=='panel-'+id)); }; 
+      tabs.forEach(t=> t.addEventListener('click',()=> sel(t.id.replace('tab-','')))); 
+    })();
+
+    // ===== RENDERIZADO =====
+    function renderLinks() { const tb = $('#tabla-links tbody'); tb.innerHTML = ''; state.links.forEach((link, i) => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${link.nombre}</td><td><a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a></td><td><button class="btn ghost" data-type="link-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderRecetas() { const tb = $('#tabla-recetas tbody'); tb.innerHTML = ''; state.recetas.forEach((receta, i) => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${receta.nombre}</td><td class="row"><button class="btn ghost" data-type="receta-view" data-i="${i}">Ver</button><button class="btn ghost" data-type="receta-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderPropiedades(){ const tb=$('#tabla-propiedades tbody'); tb.innerHTML=''; state.propiedades.forEach((p,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${p.nombre}</td><td>${p.ciudad}</td><td>${p.arrendatario}</td><td>${fmt(p.alquiler||0)}</td><td class="row"><button class="btn ghost" data-type="prop-edit" data-i="${i}">Editar</button><button class="btn ghost" data-type="prop-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); renderComboProps(); }
+    function renderAlquileres(){ const tb=$('#tabla-alquileres tbody'); tb.innerHTML=''; state.alquileres.forEach((a,i)=>{ const prop = state.propiedades.find(p=>p.id===a.propId); const tr=document.createElement('tr'); tr.innerHTML=`<td>${prop?.nombre || 'N/A'}</td><td>${a.mes}</td><td>${fmt(a.monto)}</td><td><button class="btn ghost" data-type="alq-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderIngresos(){ const tb=$('#tabla-ingresos tbody'); tb.innerHTML=''; state.ingresos.forEach((r,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.fecha}</td><td>${fmt(r.monto)}</td><td>${r.desc||''}</td><td><button class="btn ghost" data-type="ing-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderGastos(){ const tb=$('#tabla-gastos tbody'); tb.innerHTML=''; state.gastos.forEach((r,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.fecha}</td><td>${fmt(r.monto)}</td><td>${r.desc||''}</td><td><button class="btn ghost" data-type="gas-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderServicios(){ const tb=$('#tabla-servicios tbody'); tb.innerHTML=''; state.servicios.forEach((s,i)=>{ const link=s.url?`<a href="${s.url}" target="_blank" rel="noopener">abrir</a>`:''; const tr=document.createElement('tr'); tr.innerHTML=`<td>${s.empresa}</td><td>${s.propiedad}</td><td>${link}</td><td><button class="btn ghost" data-type="serv-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderComboProps(){ const sel=$('#alq-propiedad'); if(!sel) return; const keep=sel.value; sel.innerHTML='<option value="">Seleccionar</option>'; state.propiedades.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.nombre; sel.append(o); }); if(keep) sel.value=keep; }
+    function renderResumen(){ const ym=$('#res-mes')?.value||toYM(new Date().toISOString()); if($('#res-mes')) $('#res-mes').value=ym; const sum = (list, filter, key) => list.filter(filter).reduce((s, r) => s + Number(r[key] || 0), 0); const ingM=sum(state.ingresos, r=>toYM(r.fecha)===ym, 'monto'), gasM=sum(state.gastos, r=>toYM(r.fecha)===ym, 'monto'), alqM=sum(state.alquileres, a=>a.mes===ym, 'monto'); const ingA=sum(state.ingresos, ()=>true, 'monto'), gasA=sum(state.gastos, ()=>true, 'monto'), alqA=sum(state.alquileres, ()=>true, 'monto'); const set=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=fmt(v);}; set('kpi-ing-mes',ingM); set('kpi-renta-mes',alqM); set('kpi-gas-mes',gasM); set('kpi-saldo-mes', (ingM+alqM)-gasM); set('kpi-ing-acum',ingA); set('kpi-renta-acum',alqA); set('kpi-gas-acum',gasA); set('kpi-saldo-acum', (ingA+alqA)-gasA); }
+
+    // ===== FORMULARIOS =====
+    let editingPropIndex=null;
+    $('form#form-propiedad').addEventListener('submit', (e)=>{ e.preventDefault(); const id=$('#prop-id').value||crypto.randomUUID(); const data={id, nombre:$('#prop-nombre').value, ciudad:$('#prop-ciudad').value, arrendatario:$('#prop-arrendatario').value, alquiler:$('#prop-alquiler').value}; if(editingPropIndex!==null){state.propiedades[editingPropIndex]=data; toast('Propiedad actualizada');}else{state.propiedades.push(data); toast('Propiedad creada');} persist(); renderPropiedades(); renderResumen(); editingPropIndex=null; e.target.reset();});
+    $('form#form-alquiler').addEventListener('submit',(e)=>{ e.preventDefault(); const a={propId:$('#alq-propiedad').value, mes:$('#alq-mes').value, monto:$('#alq-monto').value}; const idx=state.alquileres.findIndex(al=>al.propId===a.propId&&al.mes===a.mes); if(idx>=0){state.alquileres[idx]=a; toast('Pago actualizado');}else{state.alquileres.push(a); toast('Pago registrado');} persist(); renderAlquileres(); renderResumen(); e.target.reset(); });
+    $('form#form-ingreso').addEventListener('submit',(e)=>{ e.preventDefault(); state.ingresos.push({monto:$('#ing-monto').value, desc:$('#ing-desc').value, fecha:$('#ing-fecha').value}); persist(); renderIngresos(); renderResumen(); e.target.reset(); toast('Ingreso guardado'); });
+    $('form#form-gasto').addEventListener('submit',(e)=>{ e.preventDefault(); state.gastos.push({monto:$('#gas-monto').value, desc:$('#gas-desc').value, fecha:$('#gas-fecha').value}); persist(); renderGastos(); renderResumen(); e.target.reset(); toast('Gasto guardado'); });
+    $('form#form-servicio').addEventListener('submit',(e)=>{ e.preventDefault(); state.servicios.push({empresa:$('#serv-empresa').value, propiedad:$('#serv-propiedad').value, ciudad:$('#serv-ciudad').value, url:$('#serv-url').value}); persist(); renderServicios(); e.target.reset(); toast('Servicio guardado'); });
+    $('form#form-link').addEventListener('submit', (e) => { e.preventDefault(); const n=$('#link-nombre').value.trim(), u=$('#link-url').value.trim(); if(!n||!u)return; state.links.push({id:crypto.randomUUID(), nombre:n, url:u}); persist(); renderLinks(); e.target.reset(); toast('Enlace guardado'); });
+    $('form#form-receta').addEventListener('submit', (e) => { e.preventDefault(); const n=$('#receta-nombre').value.trim(); if(!n)return; state.recetas.push({id:crypto.randomUUID(), nombre:n, ingredientes:$('#receta-ingredientes').value.trim(), instrucciones:$('#receta-instrucciones').value.trim()}); persist(); renderRecetas(); e.target.reset(); toast('Receta guardada'); });
+
+    // ===== MANEJO DE CLICS (EDICIÓN/ELIMINACIÓN/VISTA) =====
+    document.addEventListener('click',(e)=>{ 
+      const b=e.target.closest('button'); if(!b||!b.dataset.type) return; 
+      const t=b.dataset.type, i=Number(b.dataset.i);
+      const actions = { 
+        'prop-del': { list: 'propiedades', render: renderPropiedades, msg: 'Propiedad eliminada' }, 'alq-del': { list: 'alquileres', render: renderAlquileres, msg: 'Alquiler eliminado' },
+        'ing-del': { list: 'ingresos', render: renderIngresos, msg: 'Ingreso eliminado' }, 'gas-del': { list: 'gastos', render: renderGastos, msg: 'Gasto eliminado' },
+        'serv-del': { list: 'servicios', render: renderServicios, msg: 'Servicio eliminado' }, 'link-del': { list: 'links', render: renderLinks, msg: 'Enlace eliminado' },
+        'receta-del': { list: 'recetas', render: renderRecetas, msg: 'Receta eliminada' }
+      };
+      if(actions[t]){ state[actions[t].list].splice(i,1); persist(); actions[t].render(); renderResumen(); toast(actions[t].msg); } 
+      else if(t==='prop-edit'){ editingPropIndex=i; const p=state.propiedades[i]; $('#prop-id').value=p.id; $('#prop-nombre').value=p.nombre; $('#prop-ciudad').value=p.ciudad; $('#prop-arrendatario').value=p.arrendatario; $('#prop-alquiler').value=p.alquiler; } 
+      else if(t==='receta-view'){ const r=state.recetas[i]; const content=`<h3>Ingredientes:</h3><pre>${r.ingredientes||'N/A'}</pre><h3>Instrucciones:</h3><pre>${r.instrucciones||'N/A'}</pre>`; openModal(r.nombre, content); }
+    });
+
+    // ===== EXPORTAR/IMPORTAR =====
+    function exportData(){ const payload={ app:'JustPersonal', version:7, exportedAt:new Date().toISOString(), data:state }; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup_justpersonal_'+toYM(new Date().toISOString())+'.json'; a.click(); URL.revokeObjectURL(a.href); toast('Datos exportados'); }
+    async function importData(file){ try{ const text=await file.text(); const obj=JSON.parse(text); if(!obj||obj.app!=='JustPersonal'||!obj.data) throw new Error('Archivo inválido'); Object.keys(state).forEach(key => { state[key] = obj.data[key] || []; }); persist(); init(); toast('Importación completa'); }catch(e){ console.error(e); toast(e.message); } }
+    $('#btn-export').addEventListener('click', exportData); $('#btn-import').addEventListener('click',()=>$('#file-import').click()); $('#file-import').addEventListener('change',(e)=>{ if(e.target.files?.[0]) importData(e.target.files[0]); e.target.value=''; });
+
+    // ===== ASISTENTE VIRTUAL =====
+    const chat={ panel:$('#chat-panel'), body:$('#chat-body'), input:$('#chat-input') };
+    function pushMsg(html, me=false){ const d=document.createElement('div'); d.className='msg'+(me?' me':''); d.innerHTML=html; chat.body.append(d); chat.body.scrollTop=chat.body.scrollHeight; if(state.chat.length > 50)state.chat.shift(); state.chat.push({me,html,ts:Date.now()}); persist(); }
+    const toggleChat = (force) => chat.panel.classList.toggle('open', force);
+    $('#open-chat').addEventListener('click', () => toggleChat()); $('#btn-close-chat').addEventListener('click', () => toggleChat(false));
+    $('#btn-clear-chat').addEventListener('click', ()=>{ state.chat=[]; persist(); loadChatHistory(); });
+    function showTyping() { const el = document.createElement('div'); el.className = 'msg typing'; el.id = 'typing-indicator'; el.textContent = 'Buscando...'; chat.body.appendChild(el); chat.body.scrollTop = chat.body.scrollHeight; }
+    function hideTyping() { const el = $('#typing-indicator'); if (el) el.remove(); }
+    async function askInternet(q){ 
+        showTyping();
+        const stopWords = ['qué es', 'que es', 'dime', 'explica', 'háblame de', 'hablame de', 'define', 'buscar', 'busca', 'quien fue', 'quién fue', 'cuál es', 'cual es'];
+        let searchTerm = q.toLowerCase().trim();
+        for (const word of stopWords) { if (searchTerm.startsWith(word + " ")) { searchTerm = searchTerm.substring(word.length).trim(); break; } }
+        
+        try {
+            let answer, url, source = 'desconocida';
+            const ddgRes = await fetch(API_CONFIG.duckDuckGo(searchTerm));
+            if(ddgRes.ok){ const data = await ddgRes.json(); answer = data.AbstractText || data.Answer; url = data.AbstractURL; source = 'DuckDuckGo'; }
