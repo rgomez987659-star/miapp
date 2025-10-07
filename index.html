@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>JustPersonal · Finanzas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #333;
+    }
+    .panel {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+    }
+    .panel h2 {
+      margin-top: 0;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 8px 12px;
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    #respuestaAsistente {
+      margin-top: 10px;
+      background-color: #eef;
+      padding: 10px;
+      border: 1px solid #99c;
+    }
+  </style>
+</head>
+<body>
+  <h1>JustPersonal · Finanzas</h1>
+  <p>El acumulado de alquileres se estima desde la fecha de creación de cada propiedad hasta el mes seleccionado.</p>
+
+  <div class="panel">
+    <h2>Panel de Finanzas</h2>
+    <div class="form-group">
+      <label for="nombre">Nombre Propiedad</label>
+      <input type="text" id="nombre" />
+    </div>
+    <div class="form-group">
+      <label for="ciudad">Ciudad</label>
+      <input type="text" id="ciudad" />
+    </div>
+    <div class="form-group">
+      <label for="arrendatario">Arrendatario</label>
+      <input type="text" id="arrendatario" />
+    </div>
+    <div class="form-group">
+      <label for="alquiler">Alquiler Mensual ($)</label>
+      <input type="number" id="alquiler" />
+    </div>
+    <button onclick="guardarPropiedad()">Guardar</button>
+    <button onclick="limpiarFormulario()">Limpiar</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Propiedad</th>
+          <th>Ciudad</th>
+          <th>Arrendatario</th>
+          <th>Alquiler</th>
+        </tr>
+      </thead>
+      <tbody id="tablaPropiedades">
+        <!-- Datos de propiedades -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>🧠 Asistente Virtual</h2>
+    <input type="text" id="mensajeUsuario" placeholder="Escribe tu pregunta..." />
+    <button onclick="enviarMensaje(document.getElementById('mensajeUsuario').value)">Enviar</button>
+    <div id="respuestaAsistente"></div>
+  </div>
+
+  <script src="ask.js"></script>
+  <script>
+    function guardarPropiedad() {
+      const nombre = document.getElementById("nombre").value;
+      const ciudad = document.getElementById("ciudad").value;
+      const arrendatario = document.getElementById("arrendatario").value;
+      const alquiler = document.getElementById("alquiler").value;
+
+      const tabla = document.getElementById("tablaPropiedades");
+      const fila = document.createElement("tr");
+      fila.innerHTML = `<td>${nombre}</td><td>${ciudad}</td><td>${arrendatario}</td><td>$${alquiler}</td>`;
+      tabla.appendChild(fila);
+    }
+
+    function limpiarFormulario() {
+      document.getElementById("nombre").value = "";
+      document.getElementById("ciudad").value = "";
+      document.getElementById("arrendatario").value = "";
+      document.getElementById("alquiler").value = "";
+    }
+  </script>
+</body>
+</html>
